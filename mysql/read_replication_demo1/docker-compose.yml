@@ -21,7 +21,7 @@ services:
       - ./db/mysql/master/:/var/lib/mysql # 数据库
     restart: always
     networks:
-      - app-network
+      - read_replication_demo1
 
   mysql_slave:
     container_name: read_replication_demo1_mysql_slave
@@ -43,8 +43,8 @@ services:
       - ./db/mysql/slave/:/var/lib/mysql # 数据库
     restart: always
     networks:
-      - app-network
+      - read_replication_demo1
   
 networks:
-  app-network:
+  read_replication_demo1:
     driver: bridge
