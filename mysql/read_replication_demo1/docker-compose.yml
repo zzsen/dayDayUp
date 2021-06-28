@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  mysql_master:
+    container_name: eggTestMysqlMaster
+    image: mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 33061:3306
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=sen # 创建test用户
+      - MYSQL_PASSWORD=zzsen # 设置test用户的密码
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Asia/Shanghai # 设置时区
+    volumes:
+      - ./mysql/master/my.cnf:/etc/mysql/my.cnf
+      - ./db/mysql/master/:/var/lib/mysql # 数据库
+    restart: always
+    networks:
+      - app-network
+
+  mysql_slave:
+    container_name: eggTestMysqlSlave
+    image: mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 33062:3306
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=sen # 创建test用户
+      - MYSQL_PASSWORD=zzsen # 设置test用户的密码
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Asia/Shanghai # 设置时区
+    volumes:
+      - ./mysql/slave/my.cnf:/etc/mysql/my.cnf
+      - ./db/mysql/slave/:/var/lib/mysql # 数据库
+    restart: always
+    networks:
+      - app-network
+  
+networks:
+  app-network:
+    driver: bridge
