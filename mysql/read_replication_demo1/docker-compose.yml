@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mysql_master:
-    container_name: eggTestMysqlMaster
+    container_name: read_replication_demo1_mysql_master
     image: mysql
     command:
       - --default-authentication-plugin=mysql_native_password
@@ -24,7 +24,7 @@ services:
       - app-network
 
   mysql_slave:
-    container_name: eggTestMysqlSlave
+    container_name: read_replication_demo1_mysql_slave
     image: mysql
     command:
       - --default-authentication-plugin=mysql_native_password
