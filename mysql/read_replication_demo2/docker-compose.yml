@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  mysql_master:
+    container_name: read_replication_demo1_mysql_master
+    image: mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=sen # 创建test用户
+      - MYSQL_PASSWORD=zzsen # 设置test用户的密码
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Asia/Shanghai # 设置时区
+    volumes:
+      - ./mysql/master/my.cnf:/etc/mysql/my.cnf
+      - ./db/mysql/master/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./db/mysql/master/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    networks:
+      - read_replication_demo1
+
+  mysql_slave:
+    container_name: read_replication_demo1_mysql_slave
+    image: mysql
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 3308:3306
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=sen # 创建test用户
+      - MYSQL_PASSWORD=zzsen # 设置test用户的密码
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Asia/Shanghai # 设置时区
+    volumes:
+      - ./mysql/slave/my.cnf:/etc/mysql/my.cnf
+      - ./db/mysql/slave/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./db/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    networks:
+      - read_replication_demo1
+  
+networks:
+  read_replication_demo1:
+    driver: bridge
