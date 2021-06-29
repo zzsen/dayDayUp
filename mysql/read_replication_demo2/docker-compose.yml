@@ -50,3 +50,6 @@ services:
 networks:
   read_replication_demo1:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.177.0.0/16
