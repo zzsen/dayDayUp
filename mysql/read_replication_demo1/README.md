@@ -9,6 +9,6 @@
 
 ### 如何运行
 1. 启动容器
-  >检出代码后, 进入到项目目录, 执行`docker-compose up -d`启动docker容器
+    >检出代码后, 进入到项目目录, 执行`docker-compose up -d`启动docker容器
 2. 主从简单部署
-  >[mysql主从简单部署](https://blog.csdn.net/zzsan/article/details/117304644)
+    >[mysql主从简单部署](https://blog.csdn.net/zzsan/article/details/117304644)
