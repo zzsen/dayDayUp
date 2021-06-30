@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mysql_master:
-    container_name: read_replication_demo1_mysql_master
+    container_name: read_replication_demo2_mysql_master
     image: mysql
     command:
       - --default-authentication-plugin=mysql_native_password
@@ -22,10 +22,10 @@ services:
       - ./db/mysql/master/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
-      - read_replication_demo1
+      - read_replication_demo2
 
   mysql_slave:
-    container_name: read_replication_demo1_mysql_slave
+    container_name: read_replication_demo2_mysql_slave
     image: mysql
     command:
       - --default-authentication-plugin=mysql_native_password
@@ -45,10 +45,10 @@ services:
       - ./db/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
-      - read_replication_demo1
+      - read_replication_demo2
   
 networks:
-  read_replication_demo1:
+  read_replication_demo2:
     driver: bridge
     ipam:
       config:
