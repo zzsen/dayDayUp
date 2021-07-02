@@ -78,5 +78,76 @@
 
 ## 日志
 
+### 日志类型
 
+* redo log
 
+* undo log
+
+* binlog
+
+* errorlog 
+
+* slow query log
+
+* general log
+
+* relay log
+
+### 谈谈redo log 、 undo log 和 binlog的异同
+
+#### 1. 实现层级
+
+**binlog**是mysql**服务层**实现的
+
+**redolog**和**undolog**是**引擎层**实现的, **只存在于innodb中**，myisam引擎并没有实现, 统称为事务日志
+
+#### 2. 用途
+* redo log
+   **确保事务的持久性**
+   
+   
+   
+* undo log
+	* **用于回滚**
+	* **MVCC**	
+  
+	
+	
+* binlog
+	* **复制**：MySQL Replication在Master端开启binlog，Master把它的二进制日志传递给slaves并回放来达到master-slave数据一致的目的
+	* **数据恢复**：通过mysqlbinlog工具恢复数据
+	* **增量备份**
+
+#### 3.存储内容、格式
+   * redo log
+     **物理日志**
+     
+     
+     
+   * undo log
+     **逻辑日志**
+     
+  * binlog
+     **逻辑日志**
+     
+     
+
+#### 4. 生命周期
+* redolog
+  **事务开始之后**，就开始产生 redo log 日志了
+  
+* undolog
+	**事务开始之前**，将当前事务版本生成 undo log
+	
+* binlog
+	**事务提交的时候**，一次性将事务中的 所有sql 语句按照一定的格式记录到 binlog 中
+
+### 两阶段提交
+   将数据页加载到内存 → 修改数据 → 更新数据 → **写redolog（状态为prepare）** → 写binlog → **提交事务**（**数据写入成功后将redo log状态改为commit**）
+
+### 其他相关文档建议
+
+[浅谈mysql日志系统](https://blog.csdn.net/zzsan/article/details/118397623)
+[腾讯工程师带你深入解析 MySQL binlog](https://zhuanlan.zhihu.com/p/33504555)
+[详细分析MySQL事务日志(redo log和undo log)](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)
