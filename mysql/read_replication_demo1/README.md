@@ -23,10 +23,12 @@
        ```
 
        > master_host: docker的地址, 不能写127.0.0.1
+
        > master_user: 在主库创建的用户, 步骤8中创建的用户
+       
        > master_port: 主库的端口, 默认3306
+
        > master_log_pos: 主库show master status;查询出的Position
-       >
   
   详见: [mysql主从简单部署](https://blog.csdn.net/zzsan/article/details/117304644)
 
