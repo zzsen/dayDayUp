@@ -8,10 +8,28 @@
 2. [mysql主从简单部署](https://blog.csdn.net/zzsan/article/details/117304644)
 
 ### 如何运行
-1. 启动容器
+#### 启动容器
     >检出代码后, 进入到项目目录, 执行`docker-compose up -d`启动docker容器
-2. 主从简单部署
-    >[mysql主从简单部署](https://blog.csdn.net/zzsan/article/details/117304644)
+#### 主从简单部署
+  1. 登录主服, 查看主服master状态 `show master status;`
+
+  2. 登录从服mysql，设置与主服务器相关的配置参数
+
+       ```sql
+        # 设置与主服务器相关的配置参数
+        change master to master_host='192.168.226.137',master_port=3307,master_user='replicate',master_password='123456',master_log_file='mysql-bin.000003',master_log_pos=340;
+        # 启动从服
+        start slave;
+       ```
+
+       > master_host: docker的地址, 不能写127.0.0.1
+       > master_user: 在主库创建的用户, 步骤8中创建的用户
+       > master_port: 主库的端口, 默认3306
+       > master_log_pos: 主库show master status;查询出的Position
+       >
+  
+  详见: [mysql主从简单部署](https://blog.csdn.net/zzsan/article/details/117304644)
+
 
 ### 常见问题
 #### 出现同步错误后, 后续同步不执行
@@ -28,6 +46,7 @@
 	```
 
 2. 想办法(例如, 数据库迁移等)令从库与主库的数据结构和数据都一致了之后，再来恢复主从同步的操作。
+	
 	>`start slave;`
 
 #### 重新创建容器后, 新建的容器一直在重启
@@ -47,6 +66,7 @@
     log-bin=mysql-bin
     server-id=101
     secure_file_priv=/var/lib/mysql
+
   	```
 2. 修改docker-compose内容, 文件路径映射加上 `- ./db/mysql/master/:/var/lib/mysql-files`
     ```
