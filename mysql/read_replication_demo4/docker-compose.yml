@@ -25,7 +25,8 @@ services:
       - ./mysql/mysql3308/:/var/lib/mysql # 低版本的mysql数据存于此
       - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
-    depends_on: mysql3307
+    depends_on:
+      - mysql3307
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.2
@@ -40,7 +41,8 @@ services:
       - ./mysql/mysql3309/:/var/lib/mysql # 低版本的mysql数据存于此
       - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
-    depends_on: mysql3307
+    depends_on:
+      - mysql3307
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.3
@@ -55,7 +57,8 @@ services:
       - ./mysql/mysql3310/:/var/lib/mysql # 低版本的mysql数据存于此
       - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
-    depends_on: mysql3307
+    depends_on:
+      - mysql3307
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.4
@@ -70,7 +73,8 @@ services:
       - ./mysql/mysql3311/:/var/lib/mysql # 低版本的mysql数据存于此
       - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
-    depends_on: mysql3307
+    depends_on:
+      - mysql3307
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.5
