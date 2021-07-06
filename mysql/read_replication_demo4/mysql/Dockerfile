@@ -20,6 +20,4 @@ VOLUME ./db/:/var/lib/mysql
 # 高版本的mysql数据存于此
 VOLUME ./db/:/var/lib/mysql-files
 
-CMD ["mysqld", "--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-
 EXPOSE 3306
