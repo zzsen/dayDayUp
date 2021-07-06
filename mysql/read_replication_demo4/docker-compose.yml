@@ -27,7 +27,7 @@ services:
     restart: always
     depends_on: mysql3307
     networks:
-      - read_replication_demo4:
+      read_replication_demo4:
         ipv4_address: 172.177.0.2
 
   mysql3309:
