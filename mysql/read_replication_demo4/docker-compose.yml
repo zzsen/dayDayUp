@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+  mysql3307:
+    container_name: read_replication_demo4_mysql3307
+    build: ./mysql
+    ports:
+      - 3307:3306
+    volumes:
+      - ./mysql/mysql3307/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/mysql3307/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    networks:
+      - read_replication_demo4:
+        ipv4_address: 172.177.0.1
+
+  mysql3308:
+    container_name: read_replication_demo4_mysql3308
+    build: ./mysql
+    ports:
+      - 3308:3306
+    volumes:
+      - ./mysql/mysql3308/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/mysql3308/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    depends_on: mysql3307
+    networks:
+      - read_replication_demo4:
+        ipv4_address: 172.177.0.2
+
+  mysql3309:
+    container_name: read_replication_demo4_mysql3309
+    build: ./mysql
+    ports:
+      - 3309:3306
+    volumes:
+      - ./mysql/mysql3309/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/mysql3309/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    depends_on: mysql3307
+    networks:
+      - read_replication_demo4:
+        ipv4_address: 172.177.0.3
+
+  mysql3310:
+    container_name: read_replication_demo4_mysql3310
+    build: ./mysql
+    ports:
+      - 3310:3306
+    volumes:
+      - ./mysql/mysql3310/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/mysql3310/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    depends_on: mysql3307
+    networks:
+      - read_replication_demo4:
+        ipv4_address: 172.177.0.4
+
+  mysql3311:
+    container_name: read_replication_demo4_mysql3311
+    build: ./mysql
+    ports:
+      - 3311:3306
+    volumes:
+      - ./mysql/mysql3311/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/mysql3311/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+    restart: always
+    depends_on: mysql3307
+    networks:
+      - read_replication_demo4:
+        ipv4_address: 172.177.0.5
+  
+networks:
+  read_replication_demo4:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.177.0.0/16
