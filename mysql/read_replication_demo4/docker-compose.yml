@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql3307:
     container_name: read_replication_demo4_mysql3307
-    build: ./mysql
+    build: ./mysql/mysql3307
     ports:
       - 3307:3306
     command:
