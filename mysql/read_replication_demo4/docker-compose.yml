@@ -12,8 +12,8 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./mysql/mysql3307/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/mysql3307/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/db/mysql3307/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/db/mysql3307/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
       read_replication_demo4:
@@ -30,8 +30,8 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./mysql/mysql3308/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/mysql3308/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/db/mysql3308/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/db/mysql3308/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     depends_on:
       - mysql3307
@@ -50,8 +50,8 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./mysql/mysql3309/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/mysql3309/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/db/mysql3309/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/db/mysql3309/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     depends_on:
       - mysql3307
@@ -70,8 +70,8 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./mysql/mysql3310/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/mysql3310/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/db/mysql3310/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/db/mysql3310/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     depends_on:
       - mysql3307
@@ -90,8 +90,8 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./mysql/mysql3311/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/mysql3311/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/db/mysql3311/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/db/mysql3311/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     depends_on:
       - mysql3307

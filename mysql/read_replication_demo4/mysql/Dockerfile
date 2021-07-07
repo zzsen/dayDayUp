@@ -13,11 +13,4 @@ ENV  TZ Asia/Shanghai
 # 集群名
 ENV CLUSTER_NAME PXC
 
-
-VOLUME ./my.cnf /etc/mysql/my.cnf
-# 低版本的mysql数据存于此
-VOLUME ./db/ /var/lib/mysql
-# 高版本的mysql数据存于此
-VOLUME ./db/ /var/lib/mysql-files
-
 EXPOSE 3306
