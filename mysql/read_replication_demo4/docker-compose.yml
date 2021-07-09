@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  mysql3307:
-    container_name: read_replication_demo4_mysql3307
-    build: ./mysql/mysql3307
+  mysql_master:
+    container_name: read_replication_demo4_mysql_master
+    build: ./mysql
     ports:
       - 3307:3306
     command:
@@ -11,16 +11,17 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./mysql/mysql3307/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/db/mysql3307/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/db/mysql3307/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/master/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/master/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/master/db-files/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/master.sh:/docker-entrypoint-initdb.d #挂载脚本
     restart: always
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.2
 
-  mysql3308:
-    container_name: read_replication_demo4_mysql3308
+  mysql_slave1:
+    container_name: read_replication_demo4_mysql_slave1
     build: ./mysql
     ports:
       - 3308:3306
@@ -29,18 +30,19 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./mysql/mysql3308/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/db/mysql3308/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/db/mysql3308/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/slave1/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/slave1/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/slave1/db-files/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/slave.sh:/docker-entrypoint-initdb.d #挂载脚本
     restart: always
     depends_on:
-      - mysql3307
+      - mysql_master
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.3
 
-  mysql3309:
-    container_name: read_replication_demo4_mysql3309
+  mysql_slave2:
+    container_name: read_replication_demo4_mysql_slave2
     build: ./mysql
     ports:
       - 3309:3306
@@ -49,55 +51,16 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./mysql/mysql3309/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/db/mysql3309/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/db/mysql3309/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/slave2/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/slave2/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/slave2/db-files/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/slave.sh:/docker-entrypoint-initdb.d #挂载脚本
     restart: always
     depends_on:
-      - mysql3307
+      - mysql_master
     networks:
       read_replication_demo4:
         ipv4_address: 172.177.0.4
-
-  mysql3310:
-    container_name: read_replication_demo4_mysql3310
-    build: ./mysql
-    ports:
-      - 3310:3306
-    command:
-      - --default-authentication-plugin=mysql_native_password
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./mysql/mysql3310/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/db/mysql3310/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/db/mysql3310/:/var/lib/mysql-files # 高版本的mysql数据存于此
-    restart: always
-    depends_on:
-      - mysql3307
-    networks:
-      read_replication_demo4:
-        ipv4_address: 172.177.0.5
-
-  mysql3311:
-    container_name: read_replication_demo4_mysql3311
-    build: ./mysql
-    ports:
-      - 3311:3306
-    command:
-      - --default-authentication-plugin=mysql_native_password
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./mysql/mysql3311/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/db/mysql3311/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./mysql/db/mysql3311/:/var/lib/mysql-files # 高版本的mysql数据存于此
-    restart: always
-    depends_on:
-      - mysql3307
-    networks:
-      read_replication_demo4:
-        ipv4_address: 172.177.0.6
   
 networks:
   read_replication_demo4:

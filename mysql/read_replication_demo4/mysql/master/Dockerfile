@@ -10,4 +10,10 @@ ENV  MYSQL_ROOT_PASSWORD 123456
 # 设置时区
 ENV  TZ Asia/Shanghai
 
+
+VOLUME ./my.cnf /etc/mysql/my.cnf
+VOLUME ./db/ /var/lib/mysql
+VOLUME ./db-files/ /var/lib/mysql-files
+VOLUME ./master.sh:/docker-entrypoint-initdb.d #挂载master脚本
+
 EXPOSE 3306
