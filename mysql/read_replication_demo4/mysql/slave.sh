@@ -32,4 +32,8 @@ echo $SYNC_SQL
 START_SYNC_SQL="start slave;"
 #查看同步状态
 STATUS_SQL="show slave status\G;"
-mysql -u "$ADMIN_USER" -p "$ADMIN_PASSWORD" -e "$SYNC_SQL $START_SYNC_SQL $STATUS_SQL"
+slave_ip = ('172.177.0.3' '172.177.0.4')
+for ip in slave_ip
+do
+mysql -h "${ip}" -u "$ADMIN_USER" -p "$ADMIN_PASSWORD" -e "$SYNC_SQL $START_SYNC_SQL $STATUS_SQL"
+done
