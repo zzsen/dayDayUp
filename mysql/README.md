@@ -149,7 +149,9 @@
 ### 其他相关文档建议
 
 [浅谈mysql日志系统](https://blog.csdn.net/zzsan/article/details/118397623)
+
 [腾讯工程师带你深入解析 MySQL binlog](https://zhuanlan.zhihu.com/p/33504555)
+
 [详细分析MySQL事务日志(redo log和undo log)](https://www.cnblogs.com/f-ck-need-u/p/9010872.html)
 
 
