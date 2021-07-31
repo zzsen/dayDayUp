@@ -1,3 +1,73 @@
+## redis
+Redis是一个开源的使用**C语言**编写、支持网络、可**基于内存**亦可持久化的日志型、**Key-Value**的NoSQL数据库。
+
+但是底层存储不是使用C语言的字符串类型，而是自己开发了一种数据类型SDS进行存储，SDS即**Simple Dynamic String** ，是一种动态字符串。
+
+### 特点
+#### 读写速度快
+redis官网测试读写能到10万左右每秒。
+速度快的原因:
+1. 数据存储在内存中, 访问内存的速度是远远大于访问磁盘
+2. Redis采用单线程的架构, 避免了上下文的切换和多线程带来的竞争, 也就不存在加锁释放锁的操作, 减少了CPU的消耗
+3. 采用了非阻塞IO多路复用机制。
+
+### 数据结构丰富
+Redis不仅仅支持简单的key-value类型的数据, 同时还提供list, set, zset, hash等数据结构。
+
+### 支持持久化
+Redis提供了RDB和AOF两种持久化策略, 能最大限度地保证Redis服务器宕机重启后数据不会丢失。
+
+### 支持高可用
+可以使用主从复制, 并且提供哨兵机制, 保证服务器的高可用。
+
+### 客户端语言多
+因为Redis受到社区和各大公司的广泛认可, 所以客户端语言涵盖了所有的主流编程语言, 比如Java, C, C++, PHP, NodeJS等等。
+
+## Redis的五种数据类型底层实现原理
+Redis的五种数据类型底层实现原理章节摘抄自: [Redis的五种数据类型底层实现原理是什么](https://zhuanlan.zhihu.com/p/344918922)
+
+
+Redis是一个**Key-Value**型的内存数据库, 它所有的key都是字符串, 而value常见的数据类型有五种：**string, list, set, zset, hash**。
+
+Redis的这些数据结构, 在底层都是使用**redisObject**来进行表示。**redisObject**中有三个重要的属性, 分别是**type**、 **encoding** 和 **ptr**。
+  >**type** : 保存的value的类型 
+  >
+  >**encoding** : 保存的value的编码
+  >
+  >**ptr** : 一个指针，指向实际保存的value的数据结构
+
+| type | encoding | 对象 |
+| --- | --- | --- |
+| REDIS_STRING | REDIS_ENCODING_INT | 使用整形值实现的字符串对象 ｜
+| REDIS_STRING | REDIS_ENCODING_EMBSTR | 使用embstr编码的简单动态字符串实现的字符串对象 |
+| REDIS_STRING | REDIS_ENCODING_RAW | 使用简单动态字符串实现的字符串对象 |
+| REDIS_LIST | REDIS_ENCODING_ZIPLIST | 使用压缩列表实现的列表对象 |
+| REDIS_LIST | REDIS_ENCODING_LINKEDLIST | 使用双端链表的列表对象 | 
+| REDIS_HASH | REDIS_ENCODING_ZIPLIST | 使用压缩列表实现的哈希对象 |
+| REDIS_HASH | REDIS_ENCODING_HT | 使用字典实现的哈希对象 |
+| REDIS_SET | REDIS_ENCODING_INTSET | 使用证书集合实现的集合对象 |
+| REDIS_SET | REDIS_ENCODING_HT | 使用字典实现的集合对象 |
+| REDIS_ZSET | REDIS_ENCODING_ZIPLIST | 使用压缩列表实现的有序集合对象 |
+| REDIS_ZSET | REDIS_ENCODING_SKIPLIST | 使用跳跃表和字典实现的有序集合对象 |
+
+### string
+字符串对象的 encoding 有三种，分别是：int、raw、embstr。
+``` c
+struct sdshdr{
+ int len;/*字符串长度*/
+ int free;/*未使用的字节长度*/
+ char buf[];/*保存字符串的字节数组*/
+}
+```
+SDS与C语言的字符串有什么区别呢？
+* **遍历复杂度低**, C语言获取字符串长度是从头到尾遍历，时间复杂度是O(n)，而**SDS有len属性记录字符串长度，时间复杂度为O(1)**。
+* **避免缓冲区溢出**, SDS在需要修改时，会先检查空间是否满足大小，如果不满足，则先扩展至所需大小再进行修改操作。
+* **空间预分配**, 当SDS需要进行扩展时，Redis会为SDS分配好内存，并且根据特定的算法分配多余的free空间，避免了连续执行字符串添加带来的内存分配的消耗。
+* **惰性释放**, 如果需要缩短字符串，不会立即回收多余的内存空间，而是用free记录剩余的空间，以备下次扩展时使用，避免了再次分配内存的消耗。
+* **二进制安全**, c语言在存储字符串时采用N+1的字符串数组，末尾使用'\0'标识字符串的结束，如果我们存储的字符串中间出现'\0'，那就会导致识别出错。而SDS因为记录了字符串的长度len，则没有这个问题。
+字符串类型的应用是非常广泛的，比如可以把对象转成JSON字符串存储到Redis中作为缓存，也可以使用decr、incr命令用于计数器的实现，又或者是用setnx命令为基础实现分布式锁等等。
+需要注意的是：**Redis 规定了字符串的长度不得超过 512 MB**。
+
 ## 数据库和缓存双写一致性
 ### 对于读请求的处理
 1. 先读cache, 再读db
@@ -24,8 +94,7 @@
 4. 先更新缓存, 再操作数据库
 
 ### 1. 先操作数据库, 再删除缓存
-Cache-Aside pattern 中指出
-
+Cache-Aside pattern 原则:
 **失效**：应用程序先从cache取数据, 没有得到, 则从数据库中取数据, 成功后, 放到缓存中。
 **命中**：应用程序从cache中取数据, 取到后返回。
 **更新**：先把数据存到数据库中, 成功后, 再让缓存失效。
