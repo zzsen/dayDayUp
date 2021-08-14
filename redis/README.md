@@ -339,3 +339,149 @@ ok, 如果发生上述情况, 确实是会发生脏数据。
   >加锁排队只是为了减轻数据库的压力, 并没有提高系统吞吐量。假设在高并发下, 缓存重建期间key是锁着的, 这是过来大部分请求都是阻塞的。会导致用户等待超时
 
 * 将缓存失效时间分散开, 比如可以在原有的失效时间基础上增加一个随机值, 比如1-5分钟随机, 这样缓存过期时间的重复率就会降低, 就很难引发集体失效的事件。
+
+## 为什么Redis集群有16384个槽
+根据公式HASH_SLOT=CRC16(key) mod 16384，计算出映射到哪个分片上，然后Redis去相应的节点进行操作
+**疑问**: CRC16算法产生的hash值有16bit，该算法可以产生2^16=65536个值。即，值是分布在0~65535之间。那在做mod运算的时候，为什么不mod65536，而选择mod16384?
+
+首先, 官方回答: [why redis-cluster use 16384 slots? #2576](https://github.com/redis/redis/issues/2576)
+
+这里原文引用一下:
+```
+The reason is:
+
+Normal heartbeat packets carry the full configuration of a node, that can be replaced in an idempotent way with the old in order to update an old config. This means they contain the slots configuration for a node, in raw form, that uses 2k of space with16k slots, but would use a prohibitive 8k of space using 65k slots.
+At the same time it is unlikely that Redis Cluster would scale to more than 1000 mater nodes because of other design tradeoffs.
+So 16k was in the right range to ensure enough slots per master with a max of 1000 maters, but a small enough number to propagate the slot configuration as a raw bitmap easily. Note that in small clusters the bitmap would be hard to compress because when N is small the bitmap would have slots/N bits set that is a large percentage of bits set.
+```
+
+大概翻译一下:
+1. 如果槽位为65536，发送心跳信息的消息头达8k，**发送的心跳包过于庞大**。
+在消息头中，最占空间的是myslots[CLUSTER_SLOTS/8]。 当槽位为65536时，这块的大小是: 65536÷8÷1024=8kb
+因为每秒钟，redis节点需要发送一定数量的ping消息作为心跳包，**如果槽位为65536，这个ping消息的消息头太大了，浪费带宽**。
+
+2. redis的集群主节点数量基本不可能超过1000个。
+**集群节点越多，心跳包的消息体内携带的数据越多**。redis作者在官方回答也说了, 由于存在设计权衡取舍, redis cluster节点数量不太可能超过1000个。 
+因此，对于节点数在1000以内的集群，16384个槽位够用了。没有必要拓展到65536个。
+
+3. 槽位越小，节点少的情况下，压缩比高
+Redis主节点的配置信息中，它所负责的哈希槽是通过一张bitmap的形式来保存的，在传输过程中，会对bitmap进行压缩，但是如果bitmap的填充率 slots/N 很高的话(N表示节点数)，bitmap的压缩率就很低。 如果节点数很少，而哈希槽数量很多的话，bitmap的压缩率就很低。
+
+
+## redis持久化
+前面说过, Redis是一个基于内存的非关系型的数据库，数据保存在内存中，但是内存中的数据也容易发生丢失。
+
+Redis提供了持久化的机制，分别是 **RDB(Redis DataBase)** 和 **AOF(Append Only File)** 。
+
+
+### RDB
+RDB持久化就是将当前进程的数据以**生成快照**的形式持久化到磁盘中。
+
+
+RDB持久化的时候会**单独fork一个子进程**来进行持久化，因此RDB持久化有如下特点：
+1. 开机恢复数据快。
+
+2. 写入持久化文件快。
+
+RDB的持久化也是Redis默认的持久化机制，它会把内存中的数据以快照的形式写入默认文件名为`dump.rdb`中保存。
+
+#### 持久化触发时机
+在RDB机制中触发内存中的数据进行持久化，有以下三种方式：
+1. save命令：
+save命令**不会fork子进程**，通过**阻塞当前Redis服务器**，直到RDB完成为止，所以该命令在生产中一般不会使用。
+
+2. bgsave命令：
+bgsave命令会**在后台fork一个与Redis主线程一模一样的子线程，由子线程负责内存中的数据持久化**。
+这样fork与主线程一样的子线程消耗了内存，但是不会阻塞主线程处理客户端请求，是**以空间换时间**的方式快照内存中的数据到到文件中。
+bgsave命令阻塞只会发生在fork子线程的时候，这段时间发生的非常短，可以忽略不计
+
+3. 自动化
+除了上面在命令行使用save和bgsave命令触发持久化，也可以在redis.conf配置文件中，完成配置，如下图所示
+```
+
+################################ SNAPSHOTTING  ################################
+# Save the DB on disk:
+#   save <seconds> <changes>
+
+#   after 900 sec (15 min) if at least 1 key changed
+save 900 1
+#   after 300 sec (5 min) if at least 10 keys changed
+save 300 10
+#   after 60 sec if at least 10000 keys changed
+save 60 10000
+```
+
+##### save和bgsave的对比区别
+1. save是同步持久化数据，而bgsave是异步持久化数据。
+2. save不会fork子进程，通过主进程持久化数据，会阻塞处理客户端的请求，而bdsave会fork子进程持久化数据，同时还可以处理客户端请求，高效。
+3. save不会消耗内存，而bgsave会消耗内存
+
+#### RDB的优缺点
+##### 缺点
+1. 如果要尽量避免丢失数据, 则RDB不适合
+	>在生产快照的间隔中, 如果发生异常停机, 期间的数据就会丢失
+2. 每次RDB时, 都需要fork一个子进程, 由子进程跟进持久化, 数据集较大时, fork可能会比较耗时, 造成服务器在一段时间内停止处理客户端
+
+##### 优点
+1. RBD是一个文件, 保存了某个时间点的数据集
+	> 例如, 可以每个小时备份一个rdb文件, 遇到问题可以随时回退到对应时间点
+
+2. 非常适用于灾难恢复
+	>只有一个文件, 而且内容紧凑, 可以(加密后)传输到其他服务器, 然后恢复服务
+
+3. 最大化redis性能, 父进程在保存RDB文件时, 唯一要做的就是fork一个子进程, 然后剩下的工作都由子进程处理, 父进程无需处理任何的磁盘I/O操作
+
+4. RDB在恢复大数据集时, 速度要优于AOF
+
+### AOF
+AOF是**以日志的形式记录Redis中的每一次的增删改操作**，不会记录查询操作，以文本的形式记录，打开记录的日志文件就可以查看操作记录。**默认不开启AOF**
+
+#### AOF触发机制
+AOF带来的持久化更加安全可靠，默认提供三种触发机制，如下所示：
+
+1. `no`：表示等操作系统等数据缓存同步到磁盘中（快、持久化没保证）。
+
+2. `always`：同步持久化，每次发生数据变更时，就会立即记录到磁盘中（慢，安全）。
+
+3. `everysec`：表示每秒同步一次（默认值，很快，但是会丢失一秒内的数据）。
+
+```
+# appendfsync always
+appendfsync everysec
+# appendfsync no
+```
+
+AOF中每秒同步是**异步**完成的，**效率很高**，由于该机制对日志文件的写入操作是采用append的形式, 因此在写入时即使宕机，也不会丢失已经存入日志文件的数据，数据的完整性是非常高的。
+
+
+#### AOF重写机制
+写入所有操作到日志文件时，会出现很多重复操作，甚至无效操作(如: 先i++, 再i--)，导致日志文件越来越大。记录的文件臃肿，就浪费了资源空间，所以Redis提供了rewrite机制。
+
+redis提供了`bgrewriteaof`命令。将内存中的数据以命令的方式保存到临时文件中，同时会fork出一条新进程来将文件重写。
+
+重写AOF的日志文件不是读取旧的日志文件瘦身，而是将内存中的数据用命令的方式重写一个AOF文件，重新保存替换原来旧的日志文件，因此内存中的数据才是最新的。
+
+重写操作也会**fork一个子进程来处理重写操作**，重写以内存中的数据作为重写的源，避免了操作的冗余性，保证了数据的最新。
+
+在Redis以append的形式将修改的数据写入老的磁盘中    ，同时Redis也会创建一个新的文件用于记录此期间有哪些命令被执行。
+
+
+#### AOF运作方式
+1. redis执行fork一个子进程
+2. AOF文件内容写进临时文件
+3. 父进程一边把写入指令累积到内存缓存, 一边将这些改动追加到AOF文件末尾
+4. 子进程开始重写工作, 完成后, 给父进程发送信号, 父进程收到信号后, 把内存缓存的数据追加到新AOF的末尾
+#### AOF的优缺点
+##### 优点
+1. **可靠性较高**, AOF更好保证数据不会被丢失，最多只丢失一秒内的数据
+2. 通过fork一个子进程处理持久化操作，保证了主进程不会进程io操作，能高效的处理客户端的请求。
+3. 另外重写操作保证了数据的有效性，即使日志文件过大也会进行重写。
+
+4. **可读性高**, 即使某一时刻有人执行flushall清空了所有数据，只需要拿到aof的日志文件，然后把最后一条的flushall给删除掉，就可以恢复数据。
+
+##### 缺点
+对于相同数量的数据集而言，AOF文件通常要大于RDB文件。RDB 在恢复大数据集时的速度比 AOF 的恢复速度要快。AOF在运行效率上往往会慢于RDB。
+
+	
+### 相关连接
+[浅谈redis持久化](https://blog.csdn.net/zzsan/article/details/119391466)
