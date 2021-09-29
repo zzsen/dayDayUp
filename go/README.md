@@ -11,4 +11,4 @@
 [浅谈gin](https://blog.csdn.net/zzsan/article/details/120458301)
 
 ## 其他相关文档
-[Go 为什么这么“快”](https://zhuanlan.zhihu.com/p/111346689)
+[Go 为什么这么“快” -- by '腾讯技术工程' in '知乎'](https://zhuanlan.zhihu.com/p/111346689)
