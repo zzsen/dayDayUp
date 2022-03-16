@@ -10,5 +10,7 @@
 
 [浅谈gin](https://blog.csdn.net/zzsan/article/details/120458301)
 
+[go异常处理&错误堆栈获取](https://blog.csdn.net/zzsan/article/details/123521653)
+
 ## 其他相关文档
 [Go 为什么这么“快” -- by '腾讯技术工程' in '知乎'](https://zhuanlan.zhihu.com/p/111346689)
