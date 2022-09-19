@@ -11,7 +11,7 @@ ENV  MYSQL_ROOT_PASSWORD 123456
 #设置脚本中定义的用于同步的账号
 ENV  MASTER_SYNC_USER sync_admin
 #允许同步账号的host地址
-ENV  ALLOW_HOST 172.177.0.%
+ENV  ALLOW_HOST 172.177.%.%
 # 设置时区
 ENV  TZ Asia/Shanghai
 
