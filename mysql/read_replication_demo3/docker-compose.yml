@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql_master:
     container_name: read_replication_demo3_mysql_master
-    image: mysql
+    image: mysql:8.0.29
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -26,7 +26,7 @@ services:
 
   mysql_slave:
     container_name: read_replication_demo3_mysql_slave
-    image: mysql
+    image: mysql:8.0.29
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4

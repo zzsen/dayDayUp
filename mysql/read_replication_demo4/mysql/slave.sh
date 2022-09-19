@@ -1,7 +1,7 @@
 #!/bin/bash
 #定义连接master进行同步的账号
 SLAVE_SYNC_USER="${SLAVE_SYNC_USER:-sync_admin}"
-echo $SLAVE_SYNC_USER
+echo  $SLAVE_SYNC_USER
 #定义连接master进行同步的账号密码
 SLAVE_SYNC_PASSWORD="${SLAVE_SYNC_PASSWORD:-123456}"
 echo $SLAVE_SYNC_PASSWORD
@@ -17,7 +17,7 @@ echo $MASTER_HOST
 #等待10s，保证master数据库启动成功，不然会连接失败
 sleep 10
 #连接master数据库，查询二进制数据，并解析出logfile和pos，这里同步用户要开启 REPLICATION CLIENT权限，才能使用SHOW MASTER STATUS;
-RESULT=`mysql -u "$SLAVE_SYNC_USER" -h $MASTER_HOST -p "$SLAVE_SYNC_PASSWORD" -e "SHOW MASTER STATUS;" | grep -v grep |tail -n +2| awk '{print $1,$2}'`
+RESULT=`mysql -u"$SLAVE_SYNC_USER" -h$MASTER_HOST -p"$SLAVE_SYNC_PASSWORD" -e "SHOW MASTER STATUS;" | grep -v grep |tail -n +2| awk '{print $1,$2}'`
 echo $RESULT
 #解析出logfile
 LOG_FILE_NAME=`echo $RESULT | grep -v grep | awk '{print $1}'`
@@ -32,8 +32,4 @@ echo $SYNC_SQL
 START_SYNC_SQL="start slave;"
 #查看同步状态
 STATUS_SQL="show slave status\G;"
-slave_ip = ('172.177.0.3' '172.177.0.4')
-for ip in slave_ip
-do
-mysql -h "${ip}" -u "$ADMIN_USER" -p "$ADMIN_PASSWORD" -e "$SYNC_SQL $START_SYNC_SQL $STATUS_SQL"
-done
+mysql -u"$ADMIN_USER" -p"$ADMIN_PASSWORD" -e "$SYNC_SQL $START_SYNC_SQL $STATUS_SQL"
