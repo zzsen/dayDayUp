@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql_master:
     container_name: read_replication_demo1_mysql_master
-    image: mysql
+    image: mysql:8.0.29
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -18,15 +18,15 @@ services:
       - TZ=Asia/Shanghai # 设置时区
     volumes:
       - ./mysql/master/my.cnf:/etc/mysql/my.cnf
-      - ./db/mysql/master/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./db/mysql/master/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/master/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/master/db/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
       - read_replication_demo1
 
   mysql_slave:
     container_name: read_replication_demo1_mysql_slave
-    image: mysql
+    image: mysql:8.0.29
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -41,8 +41,8 @@ services:
       - TZ=Asia/Shanghai # 设置时区
     volumes:
       - ./mysql/slave/my.cnf:/etc/mysql/my.cnf
-      - ./db/mysql/slave/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./db/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/slave/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/slave/db/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
       - read_replication_demo1

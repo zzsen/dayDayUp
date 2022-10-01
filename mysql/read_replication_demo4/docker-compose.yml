@@ -18,7 +18,7 @@ services:
     restart: always
     networks:
       read_replication_demo4:
-        ipv4_address: 172.177.0.2
+        ipv4_address: 177.177.4.2
 
   mysql_slave1:
     container_name: read_replication_demo4_mysql_slave1
@@ -39,7 +39,7 @@ services:
       - mysql_master
     networks:
       read_replication_demo4:
-        ipv4_address: 172.177.0.3
+        ipv4_address: 177.177.4.3
 
   mysql_slave2:
     container_name: read_replication_demo4_mysql_slave2
@@ -60,11 +60,11 @@ services:
       - mysql_master
     networks:
       read_replication_demo4:
-        ipv4_address: 172.177.0.4
+        ipv4_address: 177.177.4.4
   
 networks:
   read_replication_demo4:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.177.0.0/16
+        - subnet: 177.177.4.0/8

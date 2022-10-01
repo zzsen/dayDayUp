@@ -1,0 +1,84 @@
+version: '3'
+services:  
+  mysql_master:
+    container_name: read_replication_demo6_mysql_master
+    build: ./mysql
+    ports:
+      - 3307:3306
+    networks:
+      read_replication_demo6:
+        ipv4_address: 172.178.0.2 #固定ip，因为从库在连接master的时候，需要设置host
+    volumes:
+      - ./mysql/master.sh:/docker-entrypoint-initdb.d/master.sh #挂载master脚本
+      - ./mysql/master/data:/var/lib/mysql
+    restart: always
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --sync_binlog=1
+  mysql-slave1:
+    container_name: read_replication_demo6_mysql_slave1
+    build: ./mysql
+    ports:
+      - 3308:3306
+    networks:
+     read_replication_demo6:
+       ipv4_address: 172.178.0.3 #固定ip
+    volumes:
+      - ./mysql/slave.sh:/docker-entrypoint-initdb.d/slave.sh #挂载slave脚本
+      - ./mysql/slave1/data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --server-id=2
+  mysql-slave2:
+    container_name: read_replication_demo6_mysql_slave2
+    build: ./mysql
+    ports:
+      - 3309:3306
+    networks:
+     read_replication_demo6:
+       ipv4_address: 172.178.0.4 #固定ip
+    volumes:
+      - ./mysql/slave.sh:/docker-entrypoint-initdb.d/slave.sh #挂载slave脚本
+      - ./mysql/slave1/data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --server-id=3
+  mycat1:
+    container_name: read_replication_demo6_mycat1
+    build: ./mycat
+    networks:
+      read_replication_demo6:
+        ipv4_address: 172.178.0.5 #固定ip
+    volumes:
+      - ./mycat/mycat1/logs:/usr/local/mycat/logs
+      - ./mycat/mycat1/schema.xml:/usr/local/mycat/conf/schema.xml
+      - ./mycat/mycat1/wrapper.conf:/usr/local/mycat/conf/wrapper.conf
+    ports:
+      - 8066:8066
+      - 9066:9066
+  mycat2:
+    container_name: read_replication_demo6_mycat2
+    build: ./mycat
+    networks:
+      read_replication_demo6:
+        ipv4_address: 172.178.0.6 #固定ip
+    volumes:
+      - ./mycat/mycat2/logs:/usr/local/mycat/logs
+      - ./mycat/mycat2/schema.xml:/usr/local/mycat/conf/schema.xml
+      - ./mycat/mycat2/wrapper.conf:/usr/local/mycat/conf/wrapper.conf  #可以不加
+    ports:
+      - 8076:8066
+      - 9076:9066
+networks:
+  read_replication_demo6:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.178.0.0/16
+

@@ -100,3 +100,8 @@
    networks:
      - read_replication_demo1
    ```
+
+### 脚本说明
+
+clear.sh 删除数据文件及该 demo 相关容器
+rebuild.sh 执行 clear.sh, 同时重新创建 docker-compose 相关容器
