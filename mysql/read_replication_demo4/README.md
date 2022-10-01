@@ -20,7 +20,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.177.0.0/16
+        - subnet: 177.177.4.0/8
 ```
 
 2. 配置容器 ip
@@ -28,7 +28,7 @@ networks:
 ```yml
 networks:
   read_replication_demo4: # 同上面的网桥名
-    ipv4_address: 172.177.0.3
+    ipv4_address: 177.177.4.3
 ```
 
 #### 使用 docker-entrypoint-initdb.d 执行脚本

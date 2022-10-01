@@ -12,7 +12,7 @@ echo $ADMIN_USER
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-123456}"
 echo $ADMIN_PASSWORD
 #定义连接master数据库host地址
-MASTER_HOST="${MASTER_HOST:-172.177.0.2}"
+MASTER_HOST="${MASTER_HOST:-177.177.4.2}"
 echo $MASTER_HOST
 #等待10s，保证master数据库启动成功，不然会连接失败
 sleep 10

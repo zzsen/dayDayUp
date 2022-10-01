@@ -40,12 +40,12 @@ read_replication
    `docker ps -a`, 查看服务是否正常启动, 如果启动异常, 可通过`docker logs [容器名/容器id]`查看容器日志, 以排查异常所在
 3. 查看 master(主服) 和 slave(从服) 的 ip 地址, `docker inspect [容器名/容器id] | grep "IPAddress"`
 4. 连接 master(主服), 查看 master(主服)的主服状态`show master status;`, 记住`file`和`position`
-   > 这里 master(主服)ip 是 `172.177.0.2`, slave(从服)的 ip 地址是 `172.177.0.3`
+   > 这里 master(主服)ip 是 `177.177.3.2`, slave(从服)的 ip 地址是 `177.177.3.3`
 5. 连接 slave(从服), 配置 slave(从服)的主从配置的主服
 
    ```sql
    # 配置从服的主从配置的主服
-   change master to master_host='172.177.0.2',master_port=3306,master_user='root',master_password='123456',master_log_file='mysql-bin.000003',master_log_pos=340;
+   change master to master_host='177.177.3.2',master_port=3306,master_user='root',master_password='123456',master_log_file='mysql-bin.000003',master_log_pos=340;
    # 启动该mysql的从服配置
    start slave;
    ```
@@ -54,7 +54,7 @@ read_replication
 7. 连接 master(主服), 配置 master(主服)的主从配置的主服
    ```sql
    # 配置从服的主从配置的主服
-   change master to master_host='172.177.0.3',master_port=3306,master_user='root',master_password='123456',master_log_file='mysql-bin.000003',master_log_pos=340;
+   change master to master_host='177.177.3.3',master_port=3306,master_user='root',master_password='123456',master_log_file='mysql-bin.000003',master_log_pos=340;
    # 启动该mysql的从服配置
    start slave;
    ```

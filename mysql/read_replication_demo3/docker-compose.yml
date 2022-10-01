@@ -18,8 +18,8 @@ services:
       - TZ=Asia/Shanghai # 设置时区
     volumes:
       - ./mysql/master/my.cnf:/etc/mysql/my.cnf
-      - ./db/mysql/master/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./db/mysql/master/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/master/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/master/db/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
       - read_replication_demo3
@@ -41,8 +41,8 @@ services:
       - TZ=Asia/Shanghai # 设置时区
     volumes:
       - ./mysql/slave/my.cnf:/etc/mysql/my.cnf
-      - ./db/mysql/slave/:/var/lib/mysql # 低版本的mysql数据存于此
-      - ./db/mysql/slave/:/var/lib/mysql-files # 高版本的mysql数据存于此
+      - ./mysql/slave/db/:/var/lib/mysql # 低版本的mysql数据存于此
+      - ./mysql/slave/db/:/var/lib/mysql-files # 高版本的mysql数据存于此
     restart: always
     networks:
       - read_replication_demo3
@@ -52,4 +52,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.177.0.0/16
+        - subnet: 177.177.3.0/8
