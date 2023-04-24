@@ -1,0 +1,142 @@
+version: '3'
+services:
+  mysql_master:
+    container_name: mysql_master
+    image: mysql:8.0.29
+    ports:
+      - 3307:3306
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./test.sql:/docker-entrypoint-initdb.d/test.sql
+    restart: always
+    environment:
+      - MYSQL_USER=test # 创建test用户
+      - MYSQL_PASSWORD=test # 设置test用户的密码
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Asia/Shanghai # 设置时区
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --sync_binlog=1
+    networks:
+      es_net-03:
+        ipv4_address: "177.178.3.1" #固定ip
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - discovery.seed_hosts=es02
+      - cluster.initial_master_nodes=es01,es02
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    depends_on: ['mysql_master']
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - 9201:9200
+    restart: always # 服务挂了的时候始终自动重启
+    networks:
+      es_net-03:
+        ipv4_address: "177.178.3.2" #固定ip
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    container_name: es02
+    environment:
+      - node.name=es02
+      - discovery.seed_hosts=es01
+      - cluster.initial_master_nodes=es01,es02
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    depends_on: ['mysql_master']
+    volumes:
+      - esdata02:/usr/share/elasticsearch/data
+    ports:
+      - 9202:9200
+    restart: always # 服务挂了的时候始终自动重启
+    networks:
+      es_net-03:
+        ipv4_address: "177.178.3.3" #固定ip
+ 
+  kibana01:
+    image: docker.elastic.co/kibana/kibana:7.5.0
+    container_name: kibana01
+    ports:
+      - 5602:5601   
+    environment:
+      - SERVER_NAME=kibana.localhost
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - I18N_LOCALE=zh-CN
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=mypasword
+    depends_on: ['es01']
+    links:
+      - es01:es
+    restart: always # 服务挂了的时候始终自动重启
+    networks:
+      es_net-03:
+        ipv4_address: "177.178.3.4" #固定ip
+ 
+  kibana02:
+    image: docker.elastic.co/kibana/kibana:7.5.0
+    container_name: kibana02
+    ports:
+      - 5603:5601   
+    environment:
+      - SERVER_NAME=kibana.localhost
+      - ELASTICSEARCH_HOSTS=http://es02:9200
+      - I18N_LOCALE=zh-CN
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=mypasword
+    depends_on: ['es02']
+    links:
+      - es02:es
+    restart: always # 服务挂了的时候始终自动重启
+    networks:
+      es_net-03:
+        ipv4_address: "177.178.3.5" #固定ip
+
+  logstash:
+    image: logstash:7.5.0
+    container_name: logstash
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ../pkg/mysql-connector-j-8.0.31.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-8.0.31.jar
+      - ./result:/usr/share/logstash/result
+    depends_on:
+      - es01
+    links:
+      - es01:es
+      - es02:es2
+      - mysql_master:mysql1
+    ports:
+      - 4560:4560
+    networks:
+      es_net-03:
+        ipv4_address: "177.178.3.6" #固定ip
+ 
+volumes:
+  esdata01:
+    driver: local
+  esdata02:
+    driver: local
+ 
+networks:
+  es_net-03:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: "177.178.3.0/16"
