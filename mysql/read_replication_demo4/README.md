@@ -20,7 +20,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 177.177.4.0/8
+        - subnet: 177.177.4.0/16
 ```
 
 2. 配置容器 ip

@@ -29,7 +29,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 177.177.2.0/8
+        - subnet: 177.177.2.0/166
 ```
 
 ### 脚本说明
