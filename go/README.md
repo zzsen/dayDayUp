@@ -1,7 +1,11 @@
 ## go
 [chan基础](./chan/base.md)
 
+[浅谈内存逃逸](./escape_to_heap.md)
+
 [对已经关闭的的chan进行读写，会怎么样？为什么？](./chan/write_or_read_a_closed_chan.md)
+
+[for 循环 select 里, 如果通道已关闭, 会怎样? 如果 select 里只有一个 case 呢?](./chan/for_select_handle_a_closed_chan.md)
 
 ## gin相关知识整理
 
