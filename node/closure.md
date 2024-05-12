@@ -58,7 +58,116 @@ closureFunction() // 4
 ### 缺点
 1. 常驻内存，增加性能开销，使用不当会造成**内存泄漏**
 
+## 闭包常见应用场景
+1. 作为返回值
+    ``` javascript
+    function returnFunc() {
+        var a = 1
+        return function innerFunc() {
+            console.log(a)
+        }
+    }
+    var outterFunc = returnFunc()
+    outterFunc()  // 1
+    ```
+2. 作为参数传递
+    ``` javascript
+    function foo() {
+        var a = 1
+        function argFunc() {
+            console.log(a)
+        }
+        emitFunc(argFunc)
+    }
 
+    function emitFunc(argFunc) {
+        argFunc()
+    }
+    emitFunc(foo) // 1
+    ```
+3. 封装私有变量
+    ``` javascript
+    function createCounter() {
+        let count = 0
+        
+        return {
+            increment: function() {
+                count++
+            },
+            decrement: function() {
+                count--
+            },
+            getCount: function() {
+                return count
+            }
+        }
+    }
+
+    const counter = createCounter()
+    counter.increment()
+    console.log(counter.getCount()) // 输出: 1
+    ```
+4. 模块化开发
+
+    用闭包模拟私有方法
+    ``` javascript
+    var Counter = (function() {
+    var privateCounter = 0
+    function changeBy(val) {
+        privateCounter += val
+    }
+    return {
+        increment: function() {
+            changeBy(1)
+        },
+        decrement: function() {
+            changeBy(-1)
+        },
+        value: function() {
+            return privateCounter
+        }
+    }
+    })()
+
+    console.log(Counter.value()) /* logs 0 */
+    Counter.increment()
+    Counter.increment()
+    console.log(Counter.value()) /* logs 2 */
+    Counter.decrement()
+    console.log(Counter.value()) /* logs 1 */
+    ```
+
+5. 面向时间编程
+
+    定时器、事件监听、Ajax 请求、跨窗口通信、Web Workers 或者任何异步，只要使用了回调函数，实际上就是在使用闭包
+    ```javascript
+    // 定时器
+    function wait(message) {
+        setTimeout( function timer() {
+            console.log( message )
+        }, 1000)
+    }
+    wait( "Hello, closure!" )
+    // message 是 wait 函数的变量，但是被 timer 函数引用，就形成了闭包
+    // 调用 wait 后，wait 函数压入调用栈，message 被赋值，并调用定时器任务，随后弹出，1000ms之后，回调函数timer 压入调用栈，因为引用 message，所以就能打印出 message
+
+    // 事件监听 
+    let a = 1
+    let btn = document.getElementById('btn')
+    btn.addEventListener('click', function callback() {
+        console.log(a)
+    })
+    // 变量 a 被 callback 函数引用，形成闭包
+    // 事件监听和定时器一样，都属于把函数作为参数传递形成的闭包。addEventListener函数有两个参数，一为事件名，二为回调函数
+    // 调用事件监听函数，将 addEventListener 压入调用栈，词法环境中有 click 和 callback 等变量，并因为 callback 为函数，并有作用域函数形成，引用 a 变量。之后弹出调用栈，当用户点击时，回调函数触发，callback 函数压入调用栈，a 沿着作用域链往上找，找到全局作用域中的变量 a，并打印出
+
+    // AJAX
+    let a = 1
+    fetch("/api").then(function callback() {
+        console.log(a)
+    })
+    // 同事件监听
+    ```
 
 ## 相关文档
 [深入理解JavaScript——闭包](https://zhuanlan.zhihu.com/p/574913236)
