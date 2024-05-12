@@ -70,6 +70,7 @@ closureFunction() // 4
     var outterFunc = returnFunc()
     outterFunc()  // 1
     ```
+
 2. 作为参数传递
     ``` javascript
     function foo() {
@@ -85,6 +86,7 @@ closureFunction() // 4
     }
     emitFunc(foo) // 1
     ```
+
 3. 封装私有变量
     ``` javascript
     function createCounter() {
@@ -107,6 +109,7 @@ closureFunction() // 4
     counter.increment()
     console.log(counter.getCount()) // 输出: 1
     ```
+
 4. 模块化开发
 
     用闭包模拟私有方法
@@ -143,9 +146,9 @@ closureFunction() // 4
     ```javascript
     // 定时器
     function wait(message) {
-        setTimeout( function timer() {
-            console.log( message )
-        }, 1000)
+      setTimeout( function timer() {
+        console.log( message )
+      }, 1000)
     }
     wait( "Hello, closure!" )
     // message 是 wait 函数的变量，但是被 timer 函数引用，就形成了闭包
@@ -155,7 +158,7 @@ closureFunction() // 4
     let a = 1
     let btn = document.getElementById('btn')
     btn.addEventListener('click', function callback() {
-        console.log(a)
+      console.log(a)
     })
     // 变量 a 被 callback 函数引用，形成闭包
     // 事件监听和定时器一样，都属于把函数作为参数传递形成的闭包。addEventListener函数有两个参数，一为事件名，二为回调函数
@@ -164,10 +167,53 @@ closureFunction() // 4
     // AJAX
     let a = 1
     fetch("/api").then(function callback() {
-        console.log(a)
+      console.log(a)
     })
     // 同事件监听
     ```
+
+## 注意事项
+闭包使用不当，容易造成内存泄漏或性能问题
+### 内存泄漏
+由于闭包会保留对外部函数作用域的引用，如果没有正确释放，会导致内存泄漏
+``` javascript
+function outerFunction() {
+  var data = 'data'
+  return function innerFunction() {
+  console.log(data)
+  }
+}
+// 这里leakedFunction保留了对outerFunction作用域的引用
+var leakedFunction = outerFunction()
+// leakedFunction仍然保留了对outerFunction中的data的引用，导致data无法被垃圾回收，从而导致内存泄漏
+
+// 解决方案之一：手动释放引用
+leakedFunction = null //当不再需要leakedFunction时，需要手动解除引用
+```
+
+### 性能问题
+``` javascript
+function outerFunction() {
+  var data = 'data'
+  return function innerFunction() {
+    console.log(data)
+  }
+}
+for (var i = 0; i < 10000; i++) {
+  var fn = outerFunction()
+  // 在每次循环中，都会创建一个新的闭包函数
+  // 执行一些操作...
+  fn = null
+  // 但是没有手动解除对闭包函数的引用
+}
+
+// 循环中，创建了10000个闭包函数，每个函数都保留了对outerFunction作用域的引用，会占用大量的内存，无法被垃圾回收，从而导致性能问题
+```
+
+### 参考解决方案
+* 在不需要使用闭包函数时，手动解除对其的引用，如，将其赋值为null
+* 尽量避免在循环中创建大量闭包，可以将闭包移出循环，或者使用其他方式实现相同功能
+* 注意闭包函数中对外部变量的作用，确保不会保留对不在需要的变量的引用
 
 ## 相关文档
 [深入理解JavaScript——闭包](https://zhuanlan.zhihu.com/p/574913236)
