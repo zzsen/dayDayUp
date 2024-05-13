@@ -100,7 +100,7 @@
 
 **binlog**是mysql**服务层**实现的
 
-**redolog**和**undolog**是**引擎层**实现的, **只存在于innodb中**，myisam引擎并没有实现, 统称为事务日志
+**redolog**和**undolog**是**引擎层**实现的, **只存在于innodb中**, 统称为事务日志，myisam引擎并没有实现
 
 #### 2. 用途
 * redo log
@@ -146,6 +146,8 @@
 ### 两阶段提交
    将数据页加载到内存 → 修改数据 → 更新数据 → **写redolog（状态为prepare）** → 写binlog → **提交事务**（**数据写入成功后将redo log状态改为commit**）
 
+### redo log 刷盘
+[redo log 刷盘](./redolog_undolog.md)
 ### 其他相关文档建议
 
 [浅谈mysql日志系统](https://blog.csdn.net/zzsan/article/details/118397623)
@@ -228,3 +230,6 @@
 3. 占用空间
   datetime: 8 字节
   timestamp: 4 字节
+
+## 进阶用法
+[mysql with 的用法 (含 with recursive)](./with_statement.md)
