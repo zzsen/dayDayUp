@@ -233,3 +233,4 @@
 
 ## 进阶用法
 [mysql with 的用法 (含 with recursive)](./with_statement.md)
+[MySQL in和exists查询对比](./in_exists.md)
