@@ -111,6 +111,7 @@ https://elasticstack.blog.csdn.net/article/details/129396057
 # 分片
 
 每个索引由一个或多个分片组成。每个分片都是 Lucene 索引的一个实例，你可以将其视为一个独立的搜索引擎，它为 Elasticsearch 集群中的数据子集编制索引并处理查询。
+
 ![Lucene_index](./img/Lucene_index.png)
 当数据写入分片时，它会定期发布到磁盘上新的**不可变 Lucene 段**中，此时它可以用于查询。这称为`刷新`。
 
