@@ -16,6 +16,7 @@ innodb是以页为单位来进行磁盘io，页的默认大小是16KB，查询�
 
 
 为了确保每次日志成功落盘，每次将`log buffer`中的日志写入日志文件的过程中，都需要调用一次操作系统的`fsync`操作。要写入`log file`，中间需要经过操作系统内核空间的`os buffer`，调用`fsync`的作用是讲`os buffer`中的日志刷到磁盘上的`log file`中，大概过程如下：
+
 ![redolog落盘过程](./img/logBufferToLogFile.png)
 
 ### 刷盘策略
@@ -31,20 +32,21 @@ InnoDB 存储引擎使用 `innodb_flush_log_at_trx_commit` 参数配置:
 #### innodb_flush_log_at_trx_commit=0
 
 事务过程中，`redo log`写入`redo log buffer`中，由master线程每隔1s调用`fsync`操作将buffer中的内容写到操作系统的`page cache`中。MySQL宕机会造成1s的事务丢失
-![](img/innodb_flush_log_at_trx_commit_0.png)
+
+![innodb_flush_log_at_trx_commit=0](img/innodb_flush_log_at_trx_commit_0.png)
 
 #### innodb_flush_log_at_trx_commit=1 （**默认值**）
 
 * 事务提交时，主动刷盘`redo log buffer`的内容立刻同步到磁盘文件中，操作系统宕机不会丢失数据；
 * 事务未提交时，操作系统宕机`redo log buffer`丢失也不会有损失，因为事务未提交不会持久化。
 
-![](img/innodb_flush_log_at_trx_commit_1.png)
+![innodb_flush_log_at_trx_commit=1](img/innodb_flush_log_at_trx_commit_1.png)
 
 #### innodb_flush_log_at_trx_commit=2
 
 事务提交就将`redo log buffer`中的内容写入`page cache`缓存，由操作系统决定什么时候将`page cache`的内容写入磁盘。此时MySQL宕机并不会丢失数据，但是操作系统宕机会丢失这1s的数据。
 
-![](img/innodb_flush_log_at_trx_commit_2.png)
+![innodb_flush_log_at_trx_commit=2](img/innodb_flush_log_at_trx_commit_2.png)
 
 ### undo log
 `undo log`有两个作用：**提供回滚** 和 **多版本控制(MVCC)**。
