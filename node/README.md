@@ -1,6 +1,8 @@
 # 基础知识
 [闭包](./closure.md)
 
+[常见的内存泄漏及处理](./memory_leak.md)
+
 [浅谈var let const](./var_let_const.md)
 
 # 框架理解
