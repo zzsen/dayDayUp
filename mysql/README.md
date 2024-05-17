@@ -233,7 +233,11 @@
    * datetime: 8 字节
    * timestamp: 4 字节
 
-## 进阶用法
+
+## 其他基础知识
+[ddl、dml和dql](./ddl_dml_dql.md)
+
+## 进阶知识
 [mysql with 的用法 (含 with recursive)](./with_statement.md)
 
 [MySQL in和exists查询对比](./in_exists.md)
