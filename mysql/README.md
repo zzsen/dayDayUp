@@ -1,3 +1,22 @@
+## 基础知识
+[索引基本知识](./index_base.md)
+> 索引分类, 创建和使用, 最左前缀匹配
+
+[ddl、dml和dql](./ddl_dml_dql.md)
+
+## 进阶知识
+[mysql with 的用法 (含 with recursive)](./with_statement.md)
+>递归CTE
+
+[MySQL in和exists查询对比](./in_exists.md)
+
+[explain执行计划](./explain.md)
+> explain用途, 字段说明
+
+[mysql索引原理](./index_theory.md)
+>索引数据结构, 回表, 覆盖索引, 索引下推优化, 走不走索引的依据
+
+
 ## 事务
 
 ### 特性ACID
@@ -234,20 +253,3 @@
    * timestamp: 4 字节
 
 
-## 其他基础知识
-[索引基本知识](./index_base.md)
-> 索引分类, 创建和使用, 最左前缀匹配
-
-[ddl、dml和dql](./ddl_dml_dql.md)
-
-## 进阶知识
-[mysql with 的用法 (含 with recursive)](./with_statement.md)
->递归CTE
-
-[MySQL in和exists查询对比](./in_exists.md)
-
-[explain执行计划](./explain.md)
-> explain用途, 字段说明
-
-[mysql索引原理](./index_theory.md)
->索引数据结构, 回表, 覆盖索引, 索引下推优化
