@@ -7,6 +7,8 @@
 
 [for 循环 select 里, 如果通道已关闭, 会怎样? 如果 select 里只有一个 case 呢?](./chan/for_select_handle_a_closed_chan.md)
 
+[golang静态代码工具](./lint.md)
+
 ## gin相关知识整理
 
 [gin快速入门指引](https://blog.csdn.net/zzsan/article/details/120532857)
