@@ -12,10 +12,10 @@ redo log包括两部分：
 * 内存中的日志缓冲（redo log buffer），该部分日志容易丢失
 * 磁盘上的重做日志文件（redo log file），该部分数据是持久的
 
-innodb是以页为单位来进行磁盘io，页的默认大小是16KB，查询一条数据时，也是会把一页的数据加载出来，放入buffer pool中，后续查询会先从buffer pool中找，没命中再去硬盘加载，减少硬盘io开销已达到提高性能。
+innodb是以页为单位来进行磁盘io，页的默认大小是16KB，查询一条数据时，也是会把一页的数据加载出来，放入buffer pool中，后续查询会先从buffer pool中找，没命中再去硬盘加载，减少硬盘io开销以达到提高性能。
 
 
-为了确保每次日志成功落盘，每次将`log buffer`中的日志写入日志文件的过程中，都需要调用一次操作系统的`fsync`操作。要写入`log file`，中间需要经过操作系统内核空间的`os buffer`，调用`fsync`的作用是讲`os buffer`中的日志刷到磁盘上的`log file`中，大概过程如下：
+为了确保每次日志成功落盘，每次将`log buffer`中的日志写入日志文件的过程中，都需要调用一次操作系统的`fsync`操作。要写入`log file`，中间需要经过操作系统内核空间的`os buffer`，调用`fsync`的作用是将`os buffer`中的日志刷到磁盘上的`log file`中，大概过程如下：
 
 ![redolog落盘过程](./img/logBufferToLogFile.png)
 
@@ -25,13 +25,13 @@ InnoDB 存储引擎使用 `innodb_flush_log_at_trx_commit` 参数配置:
 
 |取值|策略|优点|缺点|
 |--|--|--|--|
-|0|每次事务提交时不进行刷盘操作，由master线程每隔1s进行一次刷盘。|io效率高一1，低于2|db或os宕机会丢失1s数据|
+|0|每次事务提交时不进行刷盘操作，由master线程每隔1s进行一次刷盘。|IO效率高于1，低于2|db或os宕机会丢失1s数据|
 |1|每次事务提交时都将进行刷盘操作（**默认值**）|不会丢数据|效率最低|
 |2|每次事务提交时都只把 `redo log buffer` 内容写入 `page cache`，由OS决定什么时候同步到磁盘文件中|io效率最高，仅db宕机不会丢数据|os宕机会丢失1s数据|
 
 #### innodb_flush_log_at_trx_commit=0
 
-事务过程中，`redo log`写入`redo log buffer`中，由master线程每隔1s调用`fsync`操作将buffer中的内容写到操作系统的`page cache`中。MySQL宕机会造成1s的事务丢失
+事务过程中，`redo log`写入`redo log buffer`中，由master线程每隔1s将buffer中的内容写入操作系统的`page cache`中，并调用`fsync`将`page cache`刷到磁盘。MySQL宕机会造成1s的事务丢失
 
 ![innodb_flush_log_at_trx_commit=0](img/innodb_flush_log_at_trx_commit_0.png)
 
@@ -48,7 +48,7 @@ InnoDB 存储引擎使用 `innodb_flush_log_at_trx_commit` 参数配置:
 
 ![innodb_flush_log_at_trx_commit=2](img/innodb_flush_log_at_trx_commit_2.png)
 
-### undo log
+## undo log
 `undo log`有两个作用：**提供回滚** 和 **多版本控制(MVCC)**。
 
 在数据修改的时候，不仅记录了redo，还记录了相对应的undo，如果因为某些原因导致事务失败或回滚了，可以借助该undo进行回滚。
