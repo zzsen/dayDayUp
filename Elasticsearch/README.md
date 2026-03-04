@@ -4,8 +4,8 @@ ES 和 关系型数据库的概念比较
 |RelationDB|Elasticsearch|Description|
 |--|--|--|
 |row|document|document(文档), 相当于数据库中的一行数据, 文档格式为`json`|
-|db|index| index(索引), 多 type(类型)的 document(文档)的集合, 类似数据库中的数据库, es9 中, 会弃用 type, 到时的 index 则类似数据库中的表|
-|table|type| 一个 index(索引) 中, 可存放多 type(类型)的 document(文档), 类似数据库中的表, es9 中, 会弃用 type|
+|db|index| index(索引), document(文档)的集合。ES 7 起 type 已弃用, ES 8 起完全移除, index 等同于关系型数据库中的表|
+|table|type| (**ES 8 已移除**) 早期版本中一个 index 可存放多个 type, 类似数据库中的表|
 |column|field|field(字段), json 中的某个字段, 相当于数据库中的某一列|
 |schema| mapping| mapping(映射), index(索引)中的约束, 类似数据库中的表结构(schema)|
 |sql| dsl| es 的 json 风格的查询语句, 有点类似 mongo 的查询语句|
@@ -15,15 +15,15 @@ ES 和 关系型数据库的概念比较
 
 1. document 文档
 
-   单条记录成为 document(文档), 相当于关系型数据库中的**一行数据**
+   单条记录称为 document(文档), 相当于关系型数据库中的**一行数据**
 
 2. index 索引
 
-   多个文档的集合, 成为 index(索引), 其中支持多种 type(类型)的 document(文档), 故 index(索引)相当于关系型数据库中的**数据库**
+   多个文档的集合, 称为 index(索引), 其中支持多种 type(类型)的 document(文档), 故 index(索引)相当于关系型数据库中的**数据库**
 
-3. type 类型 (**es9 弃用**)
+3. type 类型 (**ES 8 已移除**)
 
-   一个索引中, 可以存放的文档的 type(类型)可以为多个, 故 type(类型)相当于关系型数据库中的**表**
+   早期版本中一个索引可以存放多种 type(类型), 类似关系型数据库中的**表**。ES 7 起弃用, ES 8 起完全移除, 现在 index 直接等同于表
 
 4. field 字段
 
@@ -83,7 +83,7 @@ node.data: false
 node.ingest: true
 ```
 
-(4) cooridnating only node 协调节点
+(4) coordinating only node 协调节点
 
 如果一个节点不担任 master 节点的职责，不保存数据，也不预处理文档，那么这个节点将拥有一个仅可路由请求，处理搜索缩减阶段并分配批量索引的协调节点。 本质上，仅协调节点可充当智能负载平衡器。默认 elasticsearch 的所有节点都可以作为协调节点去路由和分发请求。
 
@@ -201,12 +201,7 @@ PUT /{index}/_doc/{id}
 
    > 上述例子为修改 json 中的 num, 使其加一
 
-   默认的脚本语言是`Groovy`, 需开启 groovy 沙盒功能, 即
-
-   ```yml
-   # config/elasticsearch.yml
-   script.groovy.sandbox.enabled: true
-   ```
+   ES 5.0 起默认脚本语言为 `Painless`（ES 2.x 及更早版本为 Groovy，已废弃）。Painless 开箱即用，无需额外配置。
 
 3. 更新一个可能不存在的文档
    假设现在有个需求, 是统计页面访问数量, 但是页面内容 es 中不一定存在, 更新则会失败, 此时可以用 upsert, 如果待更新的文档不存在, 则会新建.
@@ -283,9 +278,9 @@ DELETE /{index}/_doc/{id}
    | heap.percent | 堆内存使用百分比                           |
    | ram.percent  | 运行内存使用百分比                         |
    | cpu          | cpu 使用百分比                             |
-   | load_1m      | 过去 1 分钟的网关平均负载                  |
-   | load_5m      | 过去 5 分钟的网关平均负载                  |
-   | load_15m     | 过去 15 分钟的网关平均负载                 |
+   | load_1m      | 过去 1 分钟的系统平均负载                  |
+   | load_5m      | 过去 5 分钟的系统平均负载                  |
+   | load_15m     | 过去 15 分钟的系统平均负载                 |
    | node.role    |                                            |
    | master       | 是否 master 节点, 带\* 表明是，带-表明不是 |
    | name         | 节点名称                                   |
@@ -317,7 +312,7 @@ DELETE /{index}/_doc/{id}
    | ip     | 节点 ip                            |
    | node   | 节点名称                           |
 
-4. `GET /_cat/indices`查看分片信息
+4. `GET /_cat/indices`查看索引信息
 
    `GET /_cat/indices?v`
 
