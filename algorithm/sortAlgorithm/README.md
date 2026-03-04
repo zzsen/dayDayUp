@@ -10,7 +10,7 @@
 | 希尔排序 | O( n^1.3^ )       | O( n )            | O( n^2^ )         | O( 1 )     | 不稳定 | In-place  |
 | 归并排序 | O( n logn )       | O( n logn )       | O( n logn )       | O( n )     | 稳定   | Out-place |
 | 快速排序 | O( n logn )       | O( n logn )       | O( n^2^ )         | O( logn )  | 不稳定 | In-place  |
-| 堆排序   | O( n logn )       | O( n logn )       | O( n logn )       | O( log1 )  | 不稳定 | In-place  |
+| 堆排序   | O( n logn )       | O( n logn )       | O( n logn )       | O( 1 )     | 不稳定 | In-place  |
 
 > **稳定** : 排序前后, 两个相等键值的顺序不变
 > **n** : 数据规模
@@ -71,7 +71,7 @@ function bubbleSort(arr) {
 ```go
 func bubbleSort(arr []int) []int {
     arrLength := len(arr)
-    for i := 0; i < arrLength; i++ {
+    for i := 0; i < arrLength-1; i++ {
         for j := 0; j < arrLength-1-i; j++ {
             if arr[j] > arr[j+1] {
                 arr[j], arr[j+1] = arr[j+1], arr[j]
@@ -100,8 +100,7 @@ func bubbleSort(arr []int) []int {
 * 第 6 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , 36 , 26 , 27 , 44 , 46 , 38 , 47 , 50 , 48
 * 第 7 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , 36 , 27 , 44 , 46 , 38 , 47 , 50 , 48
 * 第 8 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , $\color{#52c41a}27$ , 36 , 44 , 46 , 38 , 47 , 50 , 48
-* 第 9 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , $\color{#52c41a}27$ , $\color{#52c41a}36$ , 44 , 46 , 38 , 47 ,
-50 , 48
+* 第 9 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , $\color{#52c41a}27$ , $\color{#52c41a}36$ , 44 , 46 , 38 , 47 , 50 , 48
 * 第 10 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , $\color{#52c41a}27$ , $\color{#52c41a}36$ , $\color{#52c41a}38$ , 46 , 44 , 47 , 50 , 48
 * 第 11 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , $\color{#52c41a}27$ , $\color{#52c41a}36$ , $\color{#52c41a}38$ , $\color{#52c41a}44$ , 46 , 47 , 50 , 48
 * 第 12 轮排序结果: $\color{#52c41a}2$ , $\color{#52c41a}3$ , $\color{#52c41a}4$ , $\color{#52c41a}5$ , $\color{#52c41a}15$ , $\color{#52c41a}19$ , $\color{#52c41a}26$ , $\color{#52c41a}27$ , $\color{#52c41a}36$ , $\color{#52c41a}38$ , $\color{#52c41a}44$ , $\color{#52c41a}46$ , 47 , 50 , 48
@@ -122,7 +121,7 @@ function selectionSort(arr) {
         minIndex = j;
       }
     }
-    temp = arr[i];
+    var temp = arr[i];
     arr[i] = arr[minIndex];
     arr[minIndex] = temp;
   }
@@ -239,7 +238,6 @@ func insertionSort(arr []int) []int {
 ```js
 function shellSort(arr) {
   var arrLength = arr.length;
-  var index = 1;
 
   for (
     var gap = Math.floor(arrLength / 2);
@@ -247,7 +245,7 @@ function shellSort(arr) {
     gap = Math.floor(gap / 2)
   ) {
     for (var i = gap; i < arrLength; i++) {
-      current = arr[i];
+      var current = arr[i];
       for (var j = i - gap; j >= 0 && arr[j] > current; j -= gap) {
         arr[j + gap] = arr[j];
       }
@@ -564,7 +562,7 @@ function heapSort(arr) {
 func buildMaxHeap(arr []int) []int {
 	arrLength := len(arr)
 	// 从最后一个非叶子结点开始，从左至右，从下至上进行调整, 最后得到大顶堆
-	for i := arrLength / 2; i > 0; i-- {
+	for i := arrLength/2 - 1; i >= 0; i-- {
 		heapify(arr, i, arrLength)
 	}
 	return arr
@@ -593,7 +591,7 @@ func heapSort(arr []int) []int {
     // 构造初始堆, 建立大顶堆
 	buildMaxHeap(arr)
 	arrLength := len(arr)
-	for i := arrLength - 1; i > 0; i++ {
+	for i := arrLength - 1; i > 0; i-- {
         // 交换第一个和最后一个元素，输出最后一个元素
 		swap(arr, 0, i)
         // 待排序的元素个数减一
