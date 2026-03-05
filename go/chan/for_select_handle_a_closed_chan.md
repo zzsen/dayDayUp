@@ -22,7 +22,7 @@ func main() {
 
 	go func() {
 		time.Sleep(2 * time.Second)
-		ch <- false
+		ch <- true
 		close(ch)
 	}()
 

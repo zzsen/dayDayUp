@@ -45,13 +45,13 @@ func testFunc(ch chan int) {
 1. chan 是同步的, **同一时间, 只能有一个 goroutine 操作**
 
 2. 阻塞
-   通道的发送和接受默认都是会发生阻塞，所以**通道的发送和接收必须处在不同的 goroutine 中**
+   通道的发送和接收默认都是会发生阻塞，所以**通道的发送和接收必须处在不同的 goroutine 中**
    发送数据：`chan <- data`, 阻塞的，直到另一条 goroutine，读取数据来解除阻塞
-   读取数据：`data <- chan`, 阻塞的。直到另一条 goroutine，写出数据解除阻塞。
+   接收数据：`data := <-chan`, 阻塞的。直到另一条 goroutine，写出数据解除阻塞。
 
 3. 通道读写
    `chan <- data`, 发送数据到通道, 向通道中写数据
-   `data <- chan`, 从通道中获取数据, 从通道中读数据
+   `data := <-chan`, 从通道中获取数据, 从通道中读数据
 
 ### 4.1 阻塞
 
@@ -71,7 +71,7 @@ func main() {
 		fmt.Println("子goroutine执行中")
 		time.Sleep(3 * time.Second)
 		data := <-dataChan // 从通道中读取数据
-		fmt.Println("接受到data：", data)
+		fmt.Println("接收到data：", data)
 		done <- true
 	}()
 
@@ -84,8 +84,8 @@ func main() {
 }
 
 
-// 子goroutine
-// 接受到data： 117
+// 子goroutine执行中
+// 接收到data： 117
 // 执行完成
 ```
 
@@ -143,16 +143,16 @@ func main() {
 
 	intChan := make(chan int)
 	close(intChan)
-	v3, ok := <-boolChan
+	v3, ok := <-intChan
 	fmt.Printf("value: %v, ok: %v\n", v3, ok)
 }
 
 // value: , ok: false
 // value: false, ok: false
-// value: false, ok: false
+// value: 0, ok: false
 ```
 
-## 6.缓冲通道和非缓冲通道
+## 6. 缓冲通道和非缓冲通道
 
 非缓冲通道: 发送和接收都是阻塞的
 缓冲通道: 发送数据到通道时, 只有通道缓冲区满时, 才会被阻塞; 读取数据时, 只有缓冲区为空时, 才会被阻塞
@@ -166,7 +166,7 @@ c := make(chan int, 10)
 
 ## 7. time 包
 
-time 包中有使用通道的实现定时器的 timer
+time 包中有基于通道实现的定时器 Timer
 
 ```go
 t:= time.NewTimer(d)
