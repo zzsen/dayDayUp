@@ -24,7 +24,7 @@
 
 
 ## 2. gofmt
-特点: golang **自带**的静态分析工具
+特点: golang **自带**的代码格式化工具
 
 安装：无需安装，golang自带
 
@@ -84,7 +84,7 @@
 
 
 其他：
-1. [errcheck 仓库地址](https://github.com/fzipp/gocyclo)
+1. [gocyclo 仓库地址](https://github.com/fzipp/gocyclo)
 
 
 ## 7. gosec
